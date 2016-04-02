@@ -17,7 +17,7 @@ int contaLinha(FILE *fp) {
 int inserirLista(lista_string *l, char *s, int index) {
 	int tam = strlen(s);
 	l->string[index] = (char*) calloc (tam,sizeof(char));
-	strcpy(l->string[index],p);
+	strcpy(l->string[index],s);
 	return 0;
 }
 
