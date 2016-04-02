@@ -14,21 +14,22 @@ typedef enum boolean
 		struct node * next;
 	}Node;
 
+
 	typedef struct
+	{
+		char* alfabeto;
+		int alfabetotam;
+	}Alfabeto;
+
+	typedef struct mapa
 	{
 		Node** vetor; 
 		int n; //quantidade de estados
 		char** labels; //nome dos estados
 		int* type; //tipo do estado
-		bool* state //está ou nao no estado?
-		
+		bool* state; //está ou nao no estado?
+		Alfabeto* alf;
 	}Mapa;
-	
-	typedef struct
-	{
-		char* alfabeto;
-		int alfabetotam;
-	};
 
 Mapa* newMapa(int n);
 int addAresta(Mapa* l, int origem, int destino);
