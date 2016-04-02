@@ -20,7 +20,7 @@ typedef enum boolean
 		int n; //quantidade de estados
 		char** labels; //nome dos estados
 		int* type; //tipo do estado
-		bool* state //está ou nao no estado?
+		bool* state; //está ou nao no estado?
 		
 	}Mapa;
 	
