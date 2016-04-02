@@ -1,5 +1,4 @@
 #include "mapa.h"
-#include <stdlib.h>
 
 Mapa* newMapa(int n)
 {
@@ -21,8 +20,12 @@ Mapa* newMapa(int n)
 		/*inicializando o vetor;*/
 		for (i=0; i<n; i++)
 		{
-				l->vetor[i] = NULL;
+				l->vetor[i] = NULL;	
+		
 		}
+	
+		l->alf = NULL;
+	
 		return(l);
 }
 
