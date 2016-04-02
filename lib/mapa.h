@@ -28,11 +28,7 @@ typedef enum boolean
 		char** labels; //nome dos estados
 		int* type; //tipo do estado
 		bool* state; //está ou nao no estado?
-<<<<<<< HEAD
 		Alfabeto* alf;
-=======
-		
->>>>>>> 091a0ee777219b9b734bd67299e787eb7f4eb332
 	}Mapa;
 
 Mapa* newMapa(int n);
