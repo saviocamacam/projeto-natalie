@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
 	char **string;
@@ -56,7 +57,7 @@ void imprime (lista_string *l) {
 int main(int argc, char *argv[]) {
 	int cap;
 	FILE *fp;
-	fp = fopen("modelo1.txt","r");
+	fp = fopen("modelo_2.txt","r");
 	if (!fp) {
 		printf ("Erro na abertura do arquivo!\n");
 		exit(1);
