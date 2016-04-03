@@ -1,14 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#define T 100
 typedef struct {
 	char **string;
+	int qtd;
 }lista_string;
 
 int contaLinha(FILE *fp) {
 	int nroLinhas = 0;
+	char str[30];
 	while(!feof(fp)) {
+		fgets(str,30,fp);
 		nroLinhas++;
 	}
 	return nroLinhas;
@@ -24,10 +27,18 @@ int inserirLista(lista_string *l, char *s, int index) {
 lista_string * criaLista(int cap) {
 	lista_string *eLS = (lista_string*) calloc (1,sizeof(lista_string));
 	eLS->string = (char**) calloc (cap,sizeof(char**));
+	eLS->qtd = cap;
 	return eLS;
 }
 
-lista_string importar(FILE * fp, lista_string *l) {
+void imprime (lista_string *l) {
+	int i;
+	for (i=0 ; i< l->qtd ; i++) {
+		printf ("STRING (%d):  %s\n", i, l->string[i]);
+	}
+}
+
+lista_string* importar(FILE * fp, lista_string *l) {
 	int i=0, j=0, t;
 	char c;
 	char copia[T];	
@@ -43,16 +54,10 @@ lista_string importar(FILE * fp, lista_string *l) {
 		j++;
 	}
 	fclose(fp);
-	remove_indice(l,(l->qtd-1));
 	return l;
 }
 
-void imprime (lista_string *l) {
-	int i;
-	for (i=0 ; i< l->qtd ; i++) {
-		printf ("STRING (%d):  %s\n", i, l->string[i]);
-	}
-}
+
 
 int main(int argc, char *argv[]) {
 	int cap;
@@ -62,10 +67,10 @@ int main(int argc, char *argv[]) {
 		printf ("Erro na abertura do arquivo!\n");
 		exit(1);
 	}
-	fp = fopen("modelo1.txt","r");
 	cap = contaLinha(fp);
 	lista_string * lista = criaLista(cap);
-	lista = importar(lista);
+	fp = fopen("modelo_2.txt","r");
+	lista = importar(fp,lista);
 	imprime(lista);
 	return 0;
 }
