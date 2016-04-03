@@ -4,16 +4,9 @@
 #define T 100
 
 typedef struct {
-	char ** string;
+	char **string;
 	int qtd;
 }lista_string;
-
-lista_string* criaLista(int cap) {
-	lista_string *eLS = (lista_string*) calloc (1,sizeof(lista_string));
-	eLS->string = (char**) calloc (cap,sizeof(char**));
-	eLS->qtd = cap;
-	return eLS;
-}
 
 int contaLinha(FILE *fp) {
 	int nroLinhas = 0;
@@ -22,18 +15,27 @@ int contaLinha(FILE *fp) {
 		fgets(str,30,fp);
 		nroLinhas++;
 	}
+//	rewind(fp);
 	return nroLinhas;
 }
 
 int inserirLista(lista_string *l, char *s, int index) {
-	int tam = strlen(s)+1;
+	int tam = strlen(s);
 	l->string[index] = (char*) calloc (tam,sizeof(char));
 	strcpy(l->string[index],s);
 	return 0;
 }
 
+lista_string * criaLista(int cap) {
+	lista_string *eLS = (lista_string*) calloc (1,sizeof(lista_string));
+	eLS->string = (char**) calloc (cap,sizeof(char**));
+	eLS->qtd = cap;
+	return eLS;
+}
+
 lista_string *importar(FILE * fp, lista_string *l) {
 	int i=0, j=0, t;
+	char c;
 	char copia[T];	
 	while(!feof(fp)) {
 		fgets(copia,100,fp);
@@ -51,56 +53,42 @@ lista_string *importar(FILE * fp, lista_string *l) {
 }
 
 void imprime (lista_string *l) {
-	int i=0;
+	int i;
 	for (i=0 ; i< l->qtd ; i++) {
 		printf ("STRING (%d):  %s\n", i, l->string[i]);
 	}
 }
 
-lista_string *listaEstados(lista_string * l, int index) {
-	int tam = strlen(l->string[index])+1;
-	char * str = (char*) calloc (tam,sizeof(char));
-	strcpy(str,l->string[index]);
-	str[tam] = '\0';
+
+Alfabeto* newAlfabeto(char* c)
+{
+	Alfabeto* alf;
+
+	alf = (Alfabeto*) malloc(sizeof(Alfabeto));
+	alf->alfabetotam = (strlen(c)/2);
+	strcpy(alf->alfabeto, c);
 	
-	int contEspacos=0;
-	int i=0;
-	char c = str[i];
-	while(c != '\0') {
-		c = str[i];
-		if(c ==' ') {
-			contEspacos++;
-		}
-		c = str[i++];
-	}
-	
-	lista_string * l1 = criaLista(contEspacos+1);
-	char * pch;
-	pch = strtok(str," ");
-	i = 0;
-	while(pch != NULL) {
-		inserirLista(l1,pch,i);
-		pch = strtok(NULL," ");
-		i++;
-	}
-	return l1;
+	return(alf);
 }
-
-
-int main() {
+int main(int argc, char *argv[]) {
+	int n;//alfabeto
 	int cap;
 	FILE *fp;
 	fp = fopen("modelo_2.txt","r");
-	if (!fp) {
+	if (fp == NULL) {
 		printf ("Erro na abertura do arquivo!\n");
 		exit(1);
 	}
 	cap = contaLinha(fp);
 	lista_string * lista = criaLista(cap);
-	fp = fopen("modelo_2.txt","r");
+	rewind(fp);
 	lista = importar(fp, lista);
-//	imprime(lista);
-	lista_string * listaE = listaEstados(lista, 1);
-	imprime(listaE);
+	imprime(lista);
+	
+
+	Alfabeto* a;
+	a = newAlfabeto(lista_string[qtd]);
+	
+
 	return 0;
 }

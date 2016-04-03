@@ -1,8 +1,9 @@
 #include "mapa.h"
 
-Mapa* newMapa(int n)
+Mapa* newMapa(lista_string* estados, lista_string* alfabeto, lista_string* iniciais, lista_string* finais)
 {
-		int i;
+		int i, n;
+		n = estados->qtd;
 		Node **pno; //ponteiro de ponteiro de nó
 		Mapa* l;
 		l = (Mapa*) malloc(sizeof(Mapa));
@@ -16,20 +17,48 @@ Mapa* newMapa(int n)
 		pno = (Node**) malloc(sizeof(Node*)*n);
 
 		l->vetor = pno;
-
+		l->state = (bool*) malloc(sizeof(bool)*n);
+		l->alf = alfabeto;
+		l->labels = estados->string;
+		l->type = (int*) malloc(sizeof(int)*n);
 		/*inicializando o vetor;*/
 		for (i=0; i<n; i++)
 		{
 				l->vetor[i] = NULL;	
-		
+				l->state[i] = false;
+				l->type[i] = 0;
 		}
-	
-		l->alf = NULL;
+
+		//declarando os estados
+		int j;
+		for (j=0; j<iniciais->qtd; j++)
+		{
+			for(i=0; i<n; i++)
+			{
+				if (strcmp(l->labels[i],iniciais->string[j])==0)
+				{
+					l->type[i] = -1;
+					l->state[i] = true;  
+				}
+			}
+		}
+		
+		for (j=0; j<finais->qtd; j++)
+		{
+			for(i=0; i<n; i++)
+			{
+				if (strcmp(l->labels[i],finais->string[j])==0)
+				{
+					l->type[i] = 1;
+				}
+			}
+		}
+
 	
 		return(l);
 }
 
-int addAresta(Mapa* l, int origem, int destino)
+int addAresta(Mapa* l, int origem, int destino, char caracter)
 {
 		/*verifica se os valores passados como parametros são válidos*/
 		if ((origem > l->n) || (origem < 0) || (destino > l->n) || (destino < 0))
@@ -47,15 +76,16 @@ int addAresta(Mapa* l, int origem, int destino)
 		Node* aux;
 		aux = (Node*) malloc(sizeof(Node));
 		aux->data = destino;
+		aux->val = caracter;
 		aux->next = l->vetor[origem];		
 		l->vetor[origem] = aux;
 
-		/*faz a conexão do destino com a origem*/
+/*		*faz a conexão do destino com a origem*
 		Node* aux2;
 		aux2 = (Node*) malloc(sizeof(Node));
 		aux2->data = origem;
 		aux2->next = l->vetor[destino];
-		l->vetor[destino] = aux2;
+		l->vetor[destino] = aux2; */
 		return(true);
 }
 
@@ -136,6 +166,23 @@ bool removeAresta(Mapa* l, int origem, int destino)
 
 }
 
+bool isArestaVal(Mapa* l, int origem, int destino, char c)
+{
+
+		Node* redutor;
+
+		redutor = l->vetor[origem];
+		while (redutor != NULL)
+		{
+				if ((redutor->data == destino) && (redutor->val == c))
+				{
+						return(true);
+				}
+				redutor = redutor->next;
+		}		
+		return(false);
+}
+
 bool isAresta(Mapa* l, int origem, int destino)
 {
 
@@ -152,20 +199,19 @@ bool isAresta(Mapa* l, int origem, int destino)
 		}		
 		return(false);
 }
-
 void printMapa(Mapa* l) 
 {
 		int i;
 		Node* redutor;
 
-		
+//	printf("valor de i = %d\n", l->n);	
 		for (i=0; i<l->n; i++)
 		{
 				redutor = l->vetor[i];
 				printf("Nó %d: \n",i);
 						while (redutor != NULL)
 						{
-								printf("%d\n", redutor->data);
+								printf("%d - %c\n", redutor->data, redutor->val);
 								redutor = redutor->next;
 						}
 		}
@@ -205,6 +251,10 @@ int getMatriz(Mapa* l, int*** endMatriz)
 		*endMatriz = mat;
 		return(1);
 }
+
+//void mudaEstado(Mapa* m, char c)
+
+	
 
 
 Node* newNode(int data)
