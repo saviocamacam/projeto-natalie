@@ -50,6 +50,11 @@ lista_string *importar(FILE * fp, lista_string *l) {
 			if (copia[i] == '\n') {
 				copia[i] = '\0';
 			}
+	
+			if (copia[i] == 13) //corrigindo bug
+			{
+				copia[i] = '\0';
+			}
 		}
 		inserirLista(l,copia, j);
 		j++;
@@ -82,17 +87,24 @@ lista_string *listaEstados(lista_string * l, int index) {
 		}
 		c = str[i++];
 	}
-
+//printf("quantidade de espaços %d\n", contEspacos);
 	lista_string * l1 = criaLista(contEspacos+1);
 	char * pch;
-	pch = strtok(str," ");
+	pch = strtok(str," \0");
 	i = 0;
+//	char v[]="0\0"; int m;
 	while(pch != NULL) {
+/*		printf("valor pch ->>>>>>>>>>>%s\nvalor while ->>>>>>>>>>>>>>>>> %d\n",pch, strcmp(pch,v));
+for(m=0; m<strlen(pch); m++)
+{
+	printf("//////////%d, %c/////////\n",strlen(pch), pch[m]);
+} LOUCURA MODE*/
 		inserirLista(l1,pch,i);
 		pch = strtok(NULL," ");
 		i++;
 	}
-	l1->qtd--;
+	//inserirLista(l1,'\0', i);
+//	l1->qtd--;
 	return l1;
 }
 
@@ -108,7 +120,7 @@ void addNos(lista_string* l, Mapa* m)
 		for (j=0; j<m->alf->qtd; j++)
 		{
 		//	printf("%s, %s, %d, %d\n", aux->string[1], m->alf->string[j], strcmp(aux->string[1], m->alf->string[j]), m->alf->qtd);
-			//			if (!strcmp(aux->string[1], m->alf->string[j]))
+						if (!strcmp(aux->string[1], m->alf->string[j]))
 			{
 				verif = false;
 			}
@@ -117,6 +129,7 @@ void addNos(lista_string* l, Mapa* m)
 		if(verif)
 		{
 			printf("Erro alfabeto\n");
+			exit(0);
 		}
 		//printf("\n\n\n\n");
 		for (k=0; k<m->n; k++)
@@ -127,8 +140,8 @@ void addNos(lista_string* l, Mapa* m)
 				{
 					if (!strcmp(aux->string[2],m->labels[z]))
 					{	
-						printf("foi adicionado, or:%d des:%d va:%s %d\n", k,z,aux->string[1], m->n);
-						addAresta(m,k,z,aux->string[1][0]);
+//printf("foi adicionado, or:%d des:%d va:%s %d\n", k,z,aux->string[1], m->n);
+							addAresta(m,k,z,aux->string[1][0]);
 					}
 				}
 			}
@@ -144,7 +157,7 @@ void addNos(lista_string* l, Mapa* m)
 bool processoFinal(Mapa* m, char* argv)
 {
 	int tam, i, j, k, z;
-	bool modf[m->n], epsilon = false;
+	bool modf[m->n];
 
 	tam = strlen(argv);
 
@@ -215,8 +228,37 @@ bool processoFinal(Mapa* m, char* argv)
 	else*/
 	{
 
+int or, de;
+bool ver = false;
 		for (i=0; i<tam; i++)
 		{
+		dnv:
+//epsilon
+/*
+for(or=0; or<m->n; or++)
+{
+	if (m->state[j])
+	{
+		for (de=0; de<m->n; de++)
+		{
+			if (isArestaVal(m,or,de,'B'))
+			{
+				m->state[de] = true;
+				ver=true;
+			}
+		}
+	}
+}
+
+if (ver)
+{
+ver = false;
+goto dnv;
+}*/
+
+
+
+			
 			for(j=0; j<m->n; j++)
 			{
 				if (m->state[j])
@@ -227,11 +269,12 @@ bool processoFinal(Mapa* m, char* argv)
 						{
 							modf[k] = true;
 						}
+						
 					}
 				}
 			}
 
-			for (z=0; z<m->n; z++)
+			for (z=0; z<m->n; z++) //estado atual
 			{
 				m->state[z] = modf[z];
 				modf[z] = false;	
@@ -243,7 +286,7 @@ bool processoFinal(Mapa* m, char* argv)
 			if(m->state[i])
 			{
 				if (m->type[i] == 1)
-				{
+				{	
 					return(true);
 				}
 			}
@@ -271,6 +314,20 @@ int main(int argc, char* argv[]) {
 	lista_string* estados = listaEstados(lista, 1);
 	lista_string* iniciais = listaEstados(lista, 2);
 	lista_string* finais = listaEstados(lista,3);
+
+
+	
+char v[]="0";
+//alfabeto->string[1][1] = '\0';
+char p = alfabeto->string[1][0];
+int ind =0;
+//while(p != 13)
+{
+//	ind++;
+//	p = alfabeto->string[1][ind];
+}
+//alfabeto->string[1][ind] = '\0';
+
 	Mapa* m = newMapa(estados, alfabeto, iniciais, finais);	
 	addNos(lista, m);
 		
