@@ -241,6 +241,13 @@ bool processoFinal(Mapa* m, char* argv)
 }
 
 int main(int argc, char* argv[]) {
+	if (argc <= 1)
+	{
+		printf("Digite uma palavra no parâmetro!!\n");
+		return(0);
+	}
+
+
 	int cap;
 	FILE *fp;
 	fp = fopen("modelo_2.txt","r");

@@ -17,3 +17,11 @@ bib:
 	@printf "Compilando bibliotecas..."
 	@gcc -c -g $(BIBNAME).c -o $(BIBOUTPUT).o -lm -Wall -Wextra
 	@if [ -f $(BIBOUTPUT).o ]; then printf "OK\nBiblioteca compilada com sucesso!\n"; else printf "\nErro ao compilar a biblioteca :(\n"; exit 2; fi
+
+gerasaida:
+	@printf "Verificando a saida..."
+	@if [ -f ./tmp/saida.jff ]; then echo "OK"; else printf "\nA saida do JFLAP não está na pasta ./tmp";exit 2; fi
+	@printf "Gerando Saida..."
+	@python automaton2utfpr.py "./tmp/saida.jff" "modelo_2.txt"
+	@if [ -f ./modelo_2.txt ]; then printf "Ok\nSaida gerada com sucesso\n"; else printf "Erro ao gerar a saida\n"; exit 2; fi
+
