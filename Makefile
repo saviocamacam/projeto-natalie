@@ -22,6 +22,6 @@ gerasaida:
 	@printf "Verificando a saida..."
 	@if [ -f ./tmp/saida.jff ]; then echo "OK"; else printf "\nA saida do JFLAP não está na pasta ./tmp";exit 2; fi
 	@printf "Gerando Saida..."
-	@python automaton2utfpr.py "./tmp/saida.jff" "modelo_2.txt"
+	@python ./data/automaton2utfpr.py "./tmp/saida.jff" "modelo_2.txt"
 	@if [ -f ./modelo_2.txt ]; then printf "Ok\nSaida gerada com sucesso\n"; else printf "Erro ao gerar a saida\n"; exit 2; fi
 
