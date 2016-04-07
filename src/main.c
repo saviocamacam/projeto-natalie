@@ -50,7 +50,7 @@ lista_string *importar(FILE * fp, lista_string *l) {
 			if (copia[i] == '\n') {
 				copia[i] = '\0';
 			}
-	
+
 			if (copia[i] == 13) //corrigindo bug
 			{
 				copia[i] = '\0';
@@ -87,24 +87,24 @@ lista_string *listaEstados(lista_string * l, int index) {
 		}
 		c = str[i++];
 	}
-//printf("quantidade de espaços %d\n", contEspacos);
+	//printf("quantidade de espaços %d\n", contEspacos);
 	lista_string * l1 = criaLista(contEspacos+1);
 	char * pch;
 	pch = strtok(str," \0");
 	i = 0;
-//	char v[]="0\0"; int m;
+	//	char v[]="0\0"; int m;
 	while(pch != NULL) {
-/*		printf("valor pch ->>>>>>>>>>>%s\nvalor while ->>>>>>>>>>>>>>>>> %d\n",pch, strcmp(pch,v));
-for(m=0; m<strlen(pch); m++)
-{
-	printf("//////////%d, %c/////////\n",strlen(pch), pch[m]);
-} LOUCURA MODE*/
+		/*		printf("valor pch ->>>>>>>>>>>%s\nvalor while ->>>>>>>>>>>>>>>>> %d\n",pch, strcmp(pch,v));
+				for(m=0; m<strlen(pch); m++)
+				{
+				printf("//////////%d, %c/////////\n",strlen(pch), pch[m]);
+				} LOUCURA MODE*/
 		inserirLista(l1,pch,i);
 		pch = strtok(NULL," ");
 		i++;
 	}
 	//inserirLista(l1,'\0', i);
-//	l1->qtd--;
+	//	l1->qtd--;
 	return l1;
 }
 
@@ -119,8 +119,8 @@ void addNos(lista_string* l, Mapa* m)
 		bool verif = true;
 		for (j=0; j<m->alf->qtd; j++)
 		{
-		//	printf("%s, %s, %d, %d\n", aux->string[1], m->alf->string[j], strcmp(aux->string[1], m->alf->string[j]), m->alf->qtd);
-						if (!strcmp(aux->string[1], m->alf->string[j]))
+			//	printf("%s, %s, %d, %d\n", aux->string[1], m->alf->string[j], strcmp(aux->string[1], m->alf->string[j]), m->alf->qtd);
+			if (!strcmp(aux->string[1], m->alf->string[j]))
 			{
 				verif = false;
 			}
@@ -140,8 +140,10 @@ void addNos(lista_string* l, Mapa* m)
 				{
 					if (!strcmp(aux->string[2],m->labels[z]))
 					{	
-//printf("foi adicionado, or:%d des:%d va:%s %d\n", k,z,aux->string[1], m->n);
-							addAresta(m,k,z,aux->string[1][0]);
+//						printf("foi adicionado, or:%d des:%d va:%s %d\n", k,z,aux->string[1], m->n);
+
+						addAresta(m,k,z,aux->string[1][0]);
+//printMapa(m);
 					}
 				}
 			}
@@ -153,9 +155,34 @@ void addNos(lista_string* l, Mapa* m)
 }
 
 ////////////////////////////
+void episilon(Mapa* m)
+{
+	int or, de;
+	bool ver = false;
+	
+			for(or=0; or<m->n; or++)
+			{
+
+				for (de=0; de<m->n; de++)
+				{
+					if ((isArestaVal(m,or,de,'B')) && (m->state[de] == false) && (m->state[or]))
+					{
+						m->state[de] = true;
+						ver=true;
+					}
+				}
+			}
+	if (ver)
+	{
+		ver = false;
+		episilon(m);
+	}
+}
+
+
 
 bool processoFinal(Mapa* m, char* argv)
-{
+{	
 	int tam, i, j, k, z;
 	bool modf[m->n];
 
@@ -166,99 +193,11 @@ bool processoFinal(Mapa* m, char* argv)
 		modf[i] = false;	
 	}
 
-/*	for (i=0; i<m->alf->qtd; i++)
-	{
-		if (m->alf->string[i][0] == 'B')
-		{
-			epsilon = true;
-		}
+	
 
-	}
-
-
-	int ver = 0;
-	if (epsilon)
-	{	
 		for (i=0; i<tam; i++)
 		{
-			for(j=0; j<m->n; j++)
-			{
-				if (m->state[j])
-				{
-					for(k=0; k<m->n; k++)
-					{	
-						if (isArestaVal(m,j,k,argv[i]))
-						{
-							modf[k] = true;
-						}
-					}
-				}
-			}
 
-			for (z=0; z<m->n; z++)
-			{
-				m->state[z] = modf[z];
-				modf[z] = false;	
-			}
-
-		
-			if (ver == 0)
-			{
-				argv[i] = 'B';
-				i--;
-				ver++;
-			}
-			else
-			{
-				ver = 0;
-			}
-		}
-
-		for (i=0; i<m->n; i++)
-		{		
-			if(m->state[i])
-			{
-				if (m->type[i] == 1)
-				{
-					return(true);
-				}
-			}
-		}
-	}
-	else*/
-	{
-
-int or, de;
-bool ver = false;
-		for (i=0; i<tam; i++)
-		{
-		dnv:
-//epsilon
-/*
-for(or=0; or<m->n; or++)
-{
-	if (m->state[j])
-	{
-		for (de=0; de<m->n; de++)
-		{
-			if (isArestaVal(m,or,de,'B'))
-			{
-				m->state[de] = true;
-				ver=true;
-			}
-		}
-	}
-}
-
-if (ver)
-{
-ver = false;
-goto dnv;
-}*/
-
-
-
-			
 			for(j=0; j<m->n; j++)
 			{
 				if (m->state[j])
@@ -267,9 +206,13 @@ goto dnv;
 					{
 						if (isArestaVal(m,j,k,argv[i]))
 						{
+							if(argv[i] == 'B' )
+							{
+								modf[j] = true;
+							}
 							modf[k] = true;
 						}
-						
+
 					}
 				}
 			}
@@ -279,20 +222,20 @@ goto dnv;
 				m->state[z] = modf[z];
 				modf[z] = false;	
 			}
+			episilon(m);
 		}
-
 		for (i=0; i<m->n; i++)
 		{		
 			if(m->state[i])
-			{
+				{//printf("Está aqui %d\n", i);
 				if (m->type[i] == 1)
 				{	
-					return(true);
+							return(true);
 				}
 			}
 		}
 
-	}
+	
 
 	return(false);
 }
@@ -309,28 +252,25 @@ int main(int argc, char* argv[]) {
 	lista_string * lista = criaLista(cap);
 	fp = fopen("modelo_2.txt","r");
 	lista = importar(fp, lista);
-	imprime(lista);
+//	imprime(lista);
 	lista_string* alfabeto = listaEstados(lista, 0);
 	lista_string* estados = listaEstados(lista, 1);
 	lista_string* iniciais = listaEstados(lista, 2);
 	lista_string* finais = listaEstados(lista,3);
 
 
-	
-char v[]="0";
-//alfabeto->string[1][1] = '\0';
-char p = alfabeto->string[1][0];
-int ind =0;
-//while(p != 13)
-{
-//	ind++;
-//	p = alfabeto->string[1][ind];
-}
-//alfabeto->string[1][ind] = '\0';
+
+	//alfabeto->string[1][1] = '\0';
+	//while(p != 13)
+	{
+		//	ind++;
+		//	p = alfabeto->string[1][ind];
+	}
+	//alfabeto->string[1][ind] = '\0';
 
 	Mapa* m = newMapa(estados, alfabeto, iniciais, finais);	
 	addNos(lista, m);
-		
+	episilon(m);
 	if(processoFinal(m, argv[1]))
 	{
 		printf("O parâmetro passado está no estado de aceitação!\n");
@@ -339,7 +279,7 @@ int ind =0;
 	{
 		printf("O parâmetro passado não está no estado de aceitação!\n");
 	}
-	printMapa(m);
+//	printMapa(m);
 
 	return 0;
 }

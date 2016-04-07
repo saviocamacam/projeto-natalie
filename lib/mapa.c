@@ -61,16 +61,16 @@ Mapa* newMapa(lista_string* estados, lista_string* alfabeto, lista_string* inici
 int addAresta(Mapa* l, int origem, int destino, char caracter)
 {
 		/*verifica se os valores passados como parametros são válidos*/
-		if ((origem > l->n) || (origem < 0) || (destino > l->n) || (destino < 0))
+/*		if ((origem > l->n) || (origem < 0) || (destino > l->n) || (destino < 0))
 		{
 				return(false);
 		}
 		
-		/*verifica se já existe a conexão, se já ele retorna -1*/
+		*verifica se já existe a conexão, se já ele retorna -1*
 		if (isAresta(l, origem, destino))
 		{
 				return(-1);
-		}
+		}*/
 		
 		/*faz a conexão da origem com destino*/
 		Node* aux;
