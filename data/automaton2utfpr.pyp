@@ -16,67 +16,64 @@ class Transition(object):
 		self.currentState = None
 		self.currentTapeSymbol = None
 		self.newState = None
-		self.newTapeSymbol = None
-		self.headDirection = None
+
+	def __lt__(self, other):
+		if self.currentState != other.currentState:
+			return self.currentState < other.currentState
+		if self.currentTapeSymbol != other.currentTapeSymbol:
+			return self.currentTapeSymbol < other.currentTapeSymbol
+		return self.newState < other.newState 
 
 
 class Jflap2Utfpr(object):
 	def __init__(self):
+		self.state_id_to_name = {}
 		self.alphabet = set()
 		self.states = set()
-		self.tapeSymbols = set()
-		self.initialState = None
+		self.initialStates = set()
 		self.finalStates = set()
-		self.transitions = set()
+		self.transitions = []
+		self.blankSymbol = 'B'
 
-	def convert(self, inputFile, outputFile, blankSymbol = '+', alphabet = None):
-		if alphabet is None:
-			self.alphabet = self.tapeSymbols
-		else:
-			self.alphabet = alphabet
-
+	def convert(self, inputFile, outputFile, blankSymbol = 'B', alphabet = None):
 		self.blankSymbol = blankSymbol
-		self.tapeSymbols.add(blankSymbol)
+		if alphabet is not None:
+			self.alphabet = alphabet
 
 		xmldoc = ET.parse(inputFile)
 		root = xmldoc.getroot()
 		tm = root.find('automaton')
 
-		for s in tm.findall('block'):
-			state = s.attrib['id']
-			self.states.add(state)
+		for s in tm.findall('state'):
+			state_id = s.attrib['id']
+			state_name = s.attrib['name']
+			self.state_id_to_name[state_id] = state_name
+			self.states.add(state_name)
 			if s.find('initial') is not None:
-				self.initialState = state
+				self.initialStates.add(state_name)
 			if s.find('final') is not None:
-				self.finalStates.add(state)
+				self.finalStates.add(state_name)
 
 		for t in tm.findall('transition'):
 			transition = Transition()
-			self.transitions.add(transition)
-			transition.currentState = t.find('from').text
-			transition.newState = t.find('to').text
-			transition.headDirection = t.find('move').text
+			self.transitions.append(transition)
+			transition.currentState = self.state_id_to_name[t.find('from').text]
+			transition.newState = self.state_id_to_name[t.find('to').text]
 			if t.find('read').text is not None:
 				transition.currentTapeSymbol = t.find('read').text
-				self.tapeSymbols.add(transition.currentTapeSymbol)
+				self.alphabet.add(transition.currentTapeSymbol)
 			else:
 				transition.currentTapeSymbol = blankSymbol
-			if t.find('write').text is not None:
-				transition.newTapeSymbol = t.find('write').text
-				self.tapeSymbols.add(transition.newTapeSymbol)
-			else:
-				transition.newTapeSymbol = blankSymbol
+			self.transitions.sort()
 		
 		with open(outputFile, 'wb') as csvfile:
 			writer = csv.writer(csvfile, delimiter=' ')
 			writer.writerow(list(self.alphabet))
-			writer.writerow(list(self.tapeSymbols))
-                        writer.writerow(list(self.states))
-			writer.writerow([self.blankSymbol])
-			writer.writerow([self.initialState])
+			writer.writerow(list(self.states))
+			writer.writerow(list(self.initialStates))
 			writer.writerow(list(self.finalStates))
 			for t in self.transitions:
-				writer.writerow([t.currentState, t.currentTapeSymbol, t.newState, t.newTapeSymbol, t.headDirection])
+				writer.writerow([t.currentState, t.currentTapeSymbol, t.newState])
 
 
 
@@ -85,5 +82,5 @@ if __name__ == "__main__":
 		print "Parametros insuficientes. Informe o nome de arquivo de entrada e o nome do arquivo de saida"
 		sys.exit(1)
 	converter = Jflap2Utfpr()
-	converter.convert(sys.argv[1], sys.argv[2])
+	converter.convert(sys.argv[1], sys.argv[2], "epsilon")
 
