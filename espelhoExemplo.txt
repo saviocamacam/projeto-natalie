@@ -1,0 +1,42 @@
+A X B b a
+A X B b a
+B
+0
+11
+0 b 1 B R
+8 A 4 X L
+0 B 6 X L
+1 B 2 B L
+10 X 8 X R
+10 A 10 X R
+10 B 10 X R
+2 a 3 A L
+2 b 3 B L
+3 a 3 a L
+3 b 3 b L
+4 A 4 A L
+9 X 9 X R
+4 B 4 B L
+6 A 6 A L
+8 X 8 X R
+6 B 6 B L
+6 X 6 X L
+9 B 10 X R
+8 B 11 B R
+0 A 4 X L
+4 B 5 B R
+7 B 7 B R
+7 A 7 A R
+1 b 1 b R
+1 a 1 a R
+4 X 5 X R
+1 B 2 B L
+8 B 6 X L
+3 B 0 B R
+3 A 0 A R
+5 X 11 B R
+6 B 9 B R
+7 X 8 X R
+1 A 2 A L
+5 A 7 X R
+0 a 1 A R

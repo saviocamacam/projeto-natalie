@@ -1,13 +1,14 @@
 #include "../lib/mapa.h"
 #define T 100
 
-bool verficador(Mapa* m)
+bool verficador(Mapa* m, gerenciadorFita* g)
 {
 	int i;
+	int indice = g->atual->ind;
 
 	for (i=0; i<m->n; i++)
 	{
-		if(m->state[i] == true)
+		if(m->state[indice][i] == true)
 		{
 			return(true);
 		}
@@ -120,7 +121,7 @@ void addNos(lista_string* l, Mapa* m)
 		for (j=0; j<m->alf->qtd; j++) //de 0 ate a quantidade de caracteres no alfabeto
 		{
 			//	printf("%s, %s, %d, %d\n", aux->string[1], m->alf->string[j], strcmp(aux->string[1], m->alf->string[j]), m->alf->qtd);i
-			//printf("string[%d]: %s\n",i, aux->string[1]);
+		//	printf("string[%d]: %s\n",i, aux->string[1]);
 			if (!strcmp(aux->string[1], m->alf->string[j])) //se encontrar no alfabeto muda para false e nao entra no prox if
 			{
 				verif = false;
@@ -184,13 +185,52 @@ void addNos(lista_string* l, Mapa* m)
 
 bool processoFinal(Mapa* m, gerenciadorFita* g)
 {	
-	int i, j, k, z, count=0;
+
+	if (g->validos == 0) //se não existir nenhuma fita valida entao a maquina parou e não está em estado de aceitação
+	{
+		return(false);
+	}
+
+
+
+	int i, j, k, z, count=0, indice;
 	bool modf[m->n];
-	char esc[255]; //
+	char esc[255]; 
 	char ori[255];
 
 	Fita* f = g->atual;
 
+	indice = f->ind;
+
+
+	while((f->size - f->sizeInicial) >= 100)
+	{
+		char verif;	
+		printf("Há mais de %d elementos na fita, deseja continuar a execução? s/n\n", f->size);
+		setbuf(stdin,NULL);
+		setbuf(stdout,NULL);
+		verif = getchar();
+		getchar(); //tira o /n com uma gambiarra
+		setbuf(stdin,NULL);
+		setbuf(stdout,NULL);
+		if (verif == 's')
+		{
+			f->sizeInicial = f->size;
+		}
+		else
+		{
+			if (verif == 'n')
+			{
+				exit(0);
+			}
+		}
+	}
+
+	if (!g->atual->valido) //se a fita está inválidada
+	{
+		g->atual = g->atual->next;
+		return(processoFinal(m, g));
+	}
 
 	for (i=0; i<m->n; i++)
 	{
@@ -200,7 +240,7 @@ bool processoFinal(Mapa* m, gerenciadorFita* g)
 
 	for(j=0; j<m->n; j++)
 	{
-		if (m->state[j])
+		if (m->state[indice][j])
 		{
 			for(k=0; k<m->n; k++)
 			{
@@ -213,22 +253,54 @@ bool processoFinal(Mapa* m, gerenciadorFita* g)
 			}
 		}
 	}
-
+	
+	count = 0; //zera o count para fazer as novas escritas
+	bool primeiravez = true; //é o primeiro true do vetor?
 	for (z=0; z<m->n; z++) //estado atual
 	{
-		m->state[z] = modf[z];
-		modf[z] = false;	
+
+		if (modf[z]) //se for true
+		{
+			if (primeiravez) //e primeira vez,então pode ser que não há não determinismo	
+			{
+				primeiravez = false;
+				count++;
+			}
+			else //se entrar aqui é pq há um não determinismo
+			{
+				bool *newstate = (bool*) malloc(sizeof(bool)*m->n); //cria todos os estados para o novo clone
+				int a;
+				for (a=0; a<m->n; a++)
+				{
+					if (a == z) //apenas a posição z fica em true
+					{
+						newstate[a] = true;
+					}
+					else //as outras posições ficam false
+					{
+						newstate[a] = false;
+					}
+				}
+				Fita* novafita = clonaFita(f);
+				escritaFita(novafita,esc[count], ori[count]);	
+				cloneGeral(m, g, newstate, novafita);
+				modf[z] = false; //esse modf se torna falso para retirar o determinismo desta fita
+				count++;	
+			}
+		}
+		m->state[indice][z] = modf[z];
 	}
 
-	escritaFita(f, esc[count-1], ori[count-1]);
-	bool existrue = false; //existe algum estado em true?
 
+	bool existrue = false; //existe algum estado em true?
+//imprimeFita(f);
 	for (i=0; i<m->n; i++)//verifica se está em estado de aceitação
 	{		
-		if(m->state[i])
+		if(m->state[indice][i])
 		{//printf("Está aqui %d\n", i);
 
 			existrue  = true;
+
 			if (m->type[i] == 1)
 			{	
 				return(true);
@@ -236,14 +308,19 @@ bool processoFinal(Mapa* m, gerenciadorFita* g)
 		}
 	}
 
+	g->atual = g->atual->next;
 	if (existrue)
 	{
-		g->atual = g->atual->next;
+
+		escritaFita(f, esc[0], ori[0]);
 		return(processoFinal(m,g));
 	}
 	else
 	{
-		return(false);
+		f->valido = false; //invalida a fita!!
+//imprimeFita(f);
+		g->validos--;
+		return(processoFinal(m,g));	
 	}
 }
 
@@ -266,7 +343,7 @@ int main(int argc, char* argv[]) {
 	lista_string * lista = criaLista(cap);
 	fp = fopen("modelo_2.txt","r");
 	lista = importar(fp, lista);
-	imprime(lista);
+//	imprime(lista);
 	//	lista_string* alfabeto = listaEstados(lista, 0);//automato
 	//	lista_string* estados = listaEstados(lista, 1);
 	//	lista_string* iniciais = listaEstados(lista, 2);

@@ -39,6 +39,8 @@ typedef enum boolean
 	typedef struct fita{
 		struct fita* next;
 		nofita* posicao;
+		bool valido; //verifica se a fita é valida ou não
+		int ind; //indica o indice que represenra seus states no mapa
 		int size; 
 		int sizeInicial;
 		lista_string* alfabeto;
@@ -48,6 +50,7 @@ typedef enum boolean
 	typedef struct {
 		Fita* atual; 
 		int size;
+		int validos; //validos e valido da fita
 	}gerenciadorFita;
 
 	typedef struct mapa
@@ -56,16 +59,18 @@ typedef enum boolean
 		int n; //quantidade de estados
 		char** labels; //nome dos estados
 		int* type; //tipo do estado
-		bool* state; //está ou nao no estado?
+		bool** state; //está ou nao no estado? //mudar com matriz **
 		lista_string* alf;
 	}Mapa;
+
+void cloneGeral(Mapa *m, gerenciadorFita *g, bool *newstate, Fita *clonar);
 
 gerenciadorFita* newGerenciador();
 void addFita(gerenciadorFita* g, Fita *f);
 Fita* clonaFita(Fita* f);
-
+void imprimeFita(Fita* f);
 Fita* newFita(char* entradas, lista_string* alfabeto, lista_string* nulo);
-bool escritaFita(Fita* f, char escreve, char orientacao); //orientação, move para a direita, para a esquerda ou mantem (D,E,S) //se movimentar na direcão do vazio, então gera mais um nó com a posição vazio
+bool escritaFita(Fita* f, char escreve, char orientacao); //orientação, move para a direita, para a esquerda ou mantem (R,L,S), se movimentar na direcão do vazio, então gera mais um nó com a posição vazio
 char leituraFita(Fita* f); //le a posição da fita
 
 Mapa* newMapa(lista_string* estados, lista_string* alfabeto, lista_string* iniciais, lista_string* finais);
