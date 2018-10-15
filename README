@@ -14,6 +14,6 @@ Digite make no diretório raiz para gerar o AutomatosTM.out
 
 Para executar:
 Digite ./AutomatosTM "parametro de entrada" 
-Sendo paramentro de entrada a fita, para passar uma fita vaza digite um ou vários caractere nulo. OBS: por padrão em AutomatosTM o caractere nulo é o caractere +
+Sendo parametro de entrada a fita, para passar uma fita vaza digite um ou vários caractere nulo. OBS: por padrão em AutomatosTM o caractere nulo é o caractere +
 
 
