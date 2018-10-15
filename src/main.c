@@ -1,13 +1,14 @@
 #include "../lib/mapa.h"
 #define T 100
 
-bool verficador(Mapa* m)
+bool verficador(Mapa* m, gerenciadorFita* g)
 {
 	int i;
+	int indice = g->atual->ind;
 
 	for (i=0; i<m->n; i++)
 	{
-		if(m->state[i] == true)
+		if(m->state[indice][i] == true)
 		{
 			return(true);
 		}
@@ -113,14 +114,15 @@ void addNos(lista_string* l, Mapa* m)
 	int i,j, k, z;
 	lista_string* aux;
 
-	for (i=4; i<l->qtd; i++)
+	for (i=6; i<l->qtd-1; i++)// 6 pois pula as linhas que não tem acesso TODO se faltar alguma linha ver aqui
 	{
 		aux = listaEstados(l,i);
 		bool verif = true;
-		for (j=0; j<m->alf->qtd; j++)
+		for (j=0; j<m->alf->qtd; j++) //de 0 ate a quantidade de caracteres no alfabeto
 		{
-			//	printf("%s, %s, %d, %d\n", aux->string[1], m->alf->string[j], strcmp(aux->string[1], m->alf->string[j]), m->alf->qtd);
-			if (!strcmp(aux->string[1], m->alf->string[j]))
+			//	printf("%s, %s, %d, %d\n", aux->string[1], m->alf->string[j], strcmp(aux->string[1], m->alf->string[j]), m->alf->qtd);i
+		//	printf("string[%d]: %s\n",i, aux->string[1]);
+			if (!strcmp(aux->string[1], m->alf->string[j])) //se encontrar no alfabeto muda para false e nao entra no prox if
 			{
 				verif = false;
 			}
@@ -132,18 +134,18 @@ void addNos(lista_string* l, Mapa* m)
 			exit(0);
 		}
 		//printf("\n\n\n\n");
-		for (k=0; k<m->n; k++)
+		for (k=0; k<m->n; k++) //de 0 ate a quantidade de estados
 		{
-			if (!strcmp(aux->string[0],m->labels[k]))
+			if (!strcmp(aux->string[0],m->labels[k])) //se o primeiro estado é igual ao label k
 			{
-				for (z=0; z<m->n; z++)
-				{
-					if (!strcmp(aux->string[2],m->labels[z]))
+				for (z=0; z<m->n; z++) //de 0 ate a quantidade de estados
+				{	
+					if (!strcmp(aux->string[2],m->labels[z])) //se o segundo é igual ao label z
 					{	
-//						printf("foi adicionado, or:%d des:%d va:%s %d\n", k,z,aux->string[1], m->n);
+						//				printf("foi adicionado, or:%d des:%d va:%s %d\n", k,z,aux->string[1], m->n);
 
-						addAresta(m,k,z,aux->string[1][0]);
-//printMapa(m);
+						addAresta(m,k,z,aux->string[1][0], aux->string[3][0], aux->string[4][0]); //add mapa, primeiro, segundo, caractere da transição,  string 3 = escrita....string 4 = orientação
+						//printMapa(m);
 					}
 				}
 			}
@@ -155,89 +157,171 @@ void addNos(lista_string* l, Mapa* m)
 }
 
 ////////////////////////////
-void episilon(Mapa* m)
-{
-	int or, de;
-	bool ver = false;
-	
-			for(or=0; or<m->n; or++)
-			{
+/*void episilon(Mapa* m)
+  {
+  int or, de;
+  bool ver = false;
 
-				for (de=0; de<m->n; de++)
-				{
-					if ((isArestaVal(m,or,de,'B')) && (m->state[de] == false) && (m->state[or]))
-					{
-						m->state[de] = true;
-						ver=true;
-					}
-				}
-			}
-	if (ver)
-	{
-		ver = false;
-		episilon(m);
-	}
-}
+  for(or=0; or<m->n; or++)
+  {
+
+  for (de=0; de<m->n; de++)
+  {
+  if ((isArestaVal(m,or,de,'B')) && (m->state[de] == false) && (m->state[or]))
+  {
+  m->state[de] = true;
+  ver=true;
+  }
+  }
+  }
+  if (ver)
+  {
+  ver = false;
+  episilon(m);
+  }
+  }*/
 
 
 
-bool processoFinal(Mapa* m, char* argv)
+bool processoFinal(Mapa* m, gerenciadorFita* g)
 {	
-	int tam, i, j, k, z;
-	bool modf[m->n];
 
-	tam = strlen(argv);
+	if (g->validos == 0) //se não existir nenhuma fita valida entao a maquina parou e não está em estado de aceitação
+	{
+		return(false);
+	}
+
+
+
+	int i, j, k, z, count=0, indice;
+	bool modf[m->n];
+	char esc[255]; 
+	char ori[255];
+
+	Fita* f = g->atual;
+
+	indice = f->ind;
+
+
+	while((f->size - f->sizeInicial) >= 100)
+	{
+		char verif;	
+		printf("Há mais de %d elementos na fita, deseja continuar a execução? s/n\n", f->size);
+		setbuf(stdin,NULL);
+		setbuf(stdout,NULL);
+		verif = getchar();
+		getchar(); //tira o /n com uma gambiarra
+		setbuf(stdin,NULL);
+		setbuf(stdout,NULL);
+		if (verif == 's')
+		{
+			f->sizeInicial = f->size;
+		}
+		else
+		{
+			if (verif == 'n')
+			{
+				exit(0);
+			}
+		}
+	}
+
+	if (!g->atual->valido) //se a fita está inválidada
+	{
+		g->atual = g->atual->next;
+		return(processoFinal(m, g));
+	}
 
 	for (i=0; i<m->n; i++)
 	{
 		modf[i] = false;	
 	}
 
-	
 
-		for (i=0; i<tam; i++)
+	for(j=0; j<m->n; j++)
+	{
+		if (m->state[indice][j])
 		{
-
-			for(j=0; j<m->n; j++)
+			for(k=0; k<m->n; k++)
 			{
-				if (m->state[j])
+				if (isArestaVal(m,j,k,leituraFita(f), &esc[count], &ori[count])) //tentar usar direto ao inves da função leitura 
 				{
-					for(k=0; k<m->n; k++)
-					{
-						if (isArestaVal(m,j,k,argv[i]))
-						{
-							if(argv[i] == 'B' )
-							{
-								modf[j] = true;
-							}
-							modf[k] = true;
-						}
+					modf[k] = true;
+					count++; //se esse count > 1 então há não determinismo
+				}
 
+			}
+		}
+	}
+	
+	count = 0; //zera o count para fazer as novas escritas
+	bool primeiravez = true; //é o primeiro true do vetor?
+	for (z=0; z<m->n; z++) //estado atual
+	{
+
+		if (modf[z]) //se for true
+		{
+			if (primeiravez) //e primeira vez,então pode ser que não há não determinismo	
+			{
+				primeiravez = false;
+				count++;
+			}
+			else //se entrar aqui é pq há um não determinismo
+			{
+				bool *newstate = (bool*) malloc(sizeof(bool)*m->n); //cria todos os estados para o novo clone
+				int a;
+				for (a=0; a<m->n; a++)
+				{
+					if (a == z) //apenas a posição z fica em true
+					{
+						newstate[a] = true;
+					}
+					else //as outras posições ficam false
+					{
+						newstate[a] = false;
 					}
 				}
-			}
-
-			for (z=0; z<m->n; z++) //estado atual
-			{
-				m->state[z] = modf[z];
-				modf[z] = false;	
-			}
-			episilon(m);
-		}
-		for (i=0; i<m->n; i++)
-		{		
-			if(m->state[i])
-				{//printf("Está aqui %d\n", i);
-				if (m->type[i] == 1)
-				{	
-							return(true);
-				}
+				Fita* novafita = clonaFita(f);
+				escritaFita(novafita,esc[count], ori[count]);	
+				cloneGeral(m, g, newstate, novafita);
+				modf[z] = false; //esse modf se torna falso para retirar o determinismo desta fita
+				count++;	
 			}
 		}
+		m->state[indice][z] = modf[z];
+	}
 
-	
 
-	return(false);
+	bool existrue = false; //existe algum estado em true?
+//imprimeFita(f);
+	for (i=0; i<m->n; i++)//verifica se está em estado de aceitação
+	{		
+		if(m->state[indice][i])
+		{//printf("Está aqui %d\n", i);
+
+			existrue  = true;
+
+			if (m->type[i] == 1)
+			{	
+				return(true);
+			}
+		}
+	}
+
+	g->atual = g->atual->next;
+	if (existrue)
+	{
+
+		escritaFita(f, esc[0], ori[0]);
+		return(processoFinal(m,g));
+	}
+	else
+	{
+		f->valido = false; //invalida a fita!!
+//imprimeFita(f);
+		g->validos--;
+		return(processoFinal(m,g));	
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -260,11 +344,18 @@ int main(int argc, char* argv[]) {
 	fp = fopen("modelo_2.txt","r");
 	lista = importar(fp, lista);
 //	imprime(lista);
-	lista_string* alfabeto = listaEstados(lista, 0);
-	lista_string* estados = listaEstados(lista, 1);
-	lista_string* iniciais = listaEstados(lista, 2);
-	lista_string* finais = listaEstados(lista,3);
+	//	lista_string* alfabeto = listaEstados(lista, 0);//automato
+	//	lista_string* estados = listaEstados(lista, 1);
+	//	lista_string* iniciais = listaEstados(lista, 2);
+	//	lista_string* finais = listaEstados(lista,3);
 
+
+	lista_string* alfabeto = listaEstados(lista, 0);//automato
+	lista_string* alfabetoFita = listaEstados(lista, 1);
+	lista_string* estados = listaEstados(lista, 2);
+	lista_string* blank = listaEstados(lista,3);
+	lista_string* iniciais = listaEstados(lista,4);
+	lista_string* finais = listaEstados(lista,5);
 
 
 	//alfabeto->string[1][1] = '\0';
@@ -277,8 +368,10 @@ int main(int argc, char* argv[]) {
 
 	Mapa* m = newMapa(estados, alfabeto, iniciais, finais);	
 	addNos(lista, m);
-	episilon(m);
-	if(processoFinal(m, argv[1]))
+	gerenciadorFita* g = newGerenciador();
+	addFita(g,newFita(argv[1], alfabetoFita, blank));
+	//	episilon(m);
+	if(processoFinal(m, g))
 	{
 		printf("O parâmetro passado está no estado de aceitação!\n");
 	}
@@ -286,7 +379,7 @@ int main(int argc, char* argv[]) {
 	{
 		printf("O parâmetro passado não está no estado de aceitação!\n");
 	}
-//	printMapa(m);
+	printMapa(m);
 
 	return 0;
 }

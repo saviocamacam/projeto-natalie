@@ -1,0 +1,19 @@
+Organização: 
+lib - bibliotecas do mapa e da maquina de turing
+data - arquivo python do professor para a conversão do aquivo do jflap para texto
+tmp - arquivos do jflap (.jff conhecido como arquivos .jeffersons)
+src - o main do programa
+
+Para gerar a saída:
+Com o arquivo saida.jff na pasta tmp
+digite make gerasaida na raiz
+um arquivo chamado modelo_2.txt será gerado na raiz
+
+Para compilar o código:
+Digite make no diretório raiz para gerar o AutomatosTM.out
+
+Para executar:
+Digite ./AutomatosTM "parametro de entrada" 
+Sendo parametro de entrada a fita, para passar uma fita vaza digite um ou vários caractere nulo. OBS: por padrão em AutomatosTM o caractere nulo é o caractere +
+
+

@@ -29,7 +29,7 @@ class Jflap2Utfpr(object):
 		self.finalStates = set()
 		self.transitions = set()
 
-	def convert(self, inputFile, outputFile, blankSymbol = '+', alphabet = None):
+	def convert(self, inputFile, outputFile, blankSymbol = 'B', alphabet = None):
 		if alphabet is None:
 			self.alphabet = self.tapeSymbols
 		else:
@@ -71,9 +71,8 @@ class Jflap2Utfpr(object):
 			writer = csv.writer(csvfile, delimiter=' ')
 			writer.writerow(list(self.alphabet))
 			writer.writerow(list(self.tapeSymbols))
-                        writer.writerow(list(self.states))
 			writer.writerow([self.blankSymbol])
-			writer.writerow([self.initialState])
+			writer.writerow(self.initialState)
 			writer.writerow(list(self.finalStates))
 			for t in self.transitions:
 				writer.writerow([t.currentState, t.currentTapeSymbol, t.newState, t.newTapeSymbol, t.headDirection])

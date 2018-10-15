@@ -1,7 +1,7 @@
 BIBNAME = "./lib/mapa"
 MAINAME = "./src/main"
 BIBOUTPUT = "BIBMAPA"
-MAINOUTPUT = "Automatos"
+MAINOUTPUT = "AutomatosTM"
 
 all: bib
 	@printf "Compilando o $(MAINAME)... \n"
